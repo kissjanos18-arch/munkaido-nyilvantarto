@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b91c1c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Munkaidő">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+  <title>Kiss János – Munkaidő-nyilvántartó</title>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">M</div><div><h1>Munkaidő-nyilvántartó</h1><small>Kiss János</small></div></div>
+  <span id="saveStatus" class="save-status">Helyi mentés</span>
+</header>
+<nav class="tabs" aria-label="Menü">
+  <button class="tab active" data-page="work">Munka</button>
+  <button class="tab" data-page="driving">Vezetés</button>
+  <button class="tab" data-page="leave">Távollét</button>
+  <button class="tab" data-page="summary">Összesítés</button>
+  <button class="tab" data-page="settings">Beállítások</button>
+</nav>
+<main>
+  <section id="page-work" class="page active">
+    <div class="section-head"><div><h2>Napi munkaidő</h2><p>Rögzítsd a munkanap adatait.</p></div><button id="newToday" class="secondary">Mai nap</button></div>
+    <form id="workForm" class="panel">
+      <input type="hidden" id="workId">
+      <div class="grid two">
+        <label>Dátum<input id="workDate" type="date" required></label>
+        <label>Munkavégzés helye<input id="workplace" type="text" placeholder="Műhely"></label>
+        <label>Kezdés<input id="startTime" type="time" value="08:00" required></label>
+        <label>Befejezés<input id="endTime" type="time" value="16:00" required></label>
+        <label>Szünet (perc)<input id="breakMinutes" type="number" min="0" step="1" value="0"></label>
+        <label>Megjegyzés<input id="workNote" type="text" placeholder="Nem kötelező"></label>
+      </div>
+      <div class="result-strip"><div><small>Ledolgozott idő</small><strong id="workedPreview">8,00 óra</strong></div><div><small>Túlóra</small><strong id="overtimePreview">0,00 óra</strong></div></div>
+      <div class="actions"><button class="primary" type="submit">Nap mentése</button><button class="secondary" type="button" id="clearWork">Új bejegyzés</button></div>
+    </form>
+    <div class="section-head"><h2>Rögzített napok</h2><label class="month-filter">Hónap<input id="workMonth" type="month"></label></div>
+    <div id="workList" class="entry-list"></div>
+  </section>
+
+  <section id="page-driving" class="page">
+    <div class="section-head"><div><h2>Vezetési napló</h2><p>A vezetési idő és a kilométer külön rögzíthető.</p></div></div>
+    <form id="driveForm" class="panel">
+      <input type="hidden" id="driveId">
+      <div class="grid two">
+        <label>Dátum<input id="driveDate" type="date" required></label>
+        <label>Megtett út (km)<input id="kilometers" type="number" min="0" step="0.1" value="0"></label>
+        <label>Vezetés kezdete<input id="driveStart" type="time"></label>
+        <label>Vezetés vége<input id="driveEnd" type="time"></label>
+        <label>Megjegyzés<input id="driveNote" type="text"></label>
+      </div>
+      <div class="result-strip"><div><small>Vezetési idő</small><strong id="drivePreview">0,00 óra</strong></div></div>
+      <div class="actions"><button class="primary" type="submit">Vezetés mentése</button><button class="secondary" type="button" id="clearDrive">Új bejegyzés</button></div>
+    </form>
+    <div id="driveList" class="entry-list"></div>
+  </section>
+
+  <section id="page-leave" class="page">
+    <div class="section-head"><div><h2>Szabadság és betegszabadság</h2><p>Rögzítsd az egyedi távolléti napokat.</p></div></div>
+    <form id="leaveForm" class="panel">
+      <input type="hidden" id="leaveId">
+      <div class="grid two">
+        <label>Dátum<input id="leaveDate" type="date" required></label>
+        <label>Típus<select id="leaveType"><option>Szabadság</option><option>Betegszabadság</option></select></label>
+        <label>Napok száma<input id="leaveDays" type="number" min="0.5" step="0.5" value="1"></label>
+        <label>Megjegyzés<input id="leaveNote" type="text"></label>
+      </div>
+      <div class="actions"><button class="primary" type="submit">Távollét mentése</button><button class="secondary" type="button" id="clearLeave">Új bejegyzés</button></div>
+    </form>
+    <div id="leaveList" class="entry-list"></div>
+  </section>
+
+  <section id="page-summary" class="page">
+    <div class="section-head"><div><h2>Összesítés</h2><p>Munkaidő, túlóra, távollét és bér.</p></div></div>
+    <div class="panel">
+      <label>Hónap kiválasztása<input id="summaryMonth" type="month"></label>
+      <div class="stats-grid">
+        <div class="stat"><small>Ledolgozott idő</small><strong id="sumHours">0,00 óra</strong></div>
+        <div class="stat"><small>Túlóra</small><strong id="sumOvertime">0,00 óra</strong></div>
+        <div class="stat"><small>Szabadság</small><strong id="sumVacation">0 nap</strong></div>
+        <div class="stat"><small>Betegszabadság</small><strong id="sumSick">0 nap</strong></div>
+        <div class="stat"><small>Vezetési idő</small><strong id="sumDriving">0,00 óra</strong></div>
+        <div class="stat"><small>Megtett út</small><strong id="sumKm">0 km</strong></div>
+      </div>
+      <div class="paybox"><small>Becsült nettó bér</small><strong id="sumPay">0 Ft</strong><p id="payDetails">A bér a beállított nettó órabér alapján becsült összeg.</p></div>
+      <div class="actions"><button class="primary" id="exportHtml" type="button">HTML kimutatás</button><button class="secondary" id="exportJson" type="button">Adatok biztonsági mentése</button><label class="secondary file-button">Visszaállítás JSON-ból<input id="importJson" type="file" accept="application/json"></label></div>
+    </div>
+    <p class="hint">A kimutatás a munkavégzés helyét tartalmazza, a szünetet nem jeleníti meg.</p>
+  </section>
+
+  <section id="page-settings" class="page">
+    <div class="section-head"><div><h2>Beállítások</h2><p>A számításhoz használt értékek.</p></div></div>
+    <form id="settingsForm" class="panel">
+      <label>Nettó órabér (Ft)<input id="hourlyWage" type="number" min="0" step="1" value="0"></label>
+      <label>Napi elvárt munkaidő (óra)<input id="dailyHours" type="number" min="0" step="0.25" value="8"></label>
+      <label>Túlóra szorzó (%)<input id="overtimeRate" type="number" min="100" step="1" value="150"></label>
+      <label>Alapértelmezett munkavégzési hely<input id="defaultWorkplace" type="text" value="Műhely"></label>
+      <label>Éves szabadságkeret (nap)<input id="vacationAllowance" type="number" min="0" step="0.5" value="0"></label>
+      <label>Vezetés bérezése<select id="drivingPay"><option value="separate">Külön kezelve</option><option value="included">Munkaidő részeként</option><option value="none">Nincs külön bérszámítás</option></select></label>
+      <button class="primary" type="submit">Beállítások mentése</button>
+    </form>
+    <div class="panel note"><strong>Adatvédelem</strong><p>A bejegyzések ezen az iPhone-on, a böngésző tárhelyén maradnak. Nem kerülnek fel a GitHubra. Rendszeresen készíts JSON biztonsági mentést, mert a böngészőadatok törlése adatvesztést okozhat.</p></div>
+  </section>
+</main>
+<footer>Munkaidő-nyilvántartó · Offline használatra előkészítve</footer>
+<script src="app.js"></script>
+</body>
+</html>
