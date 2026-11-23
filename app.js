@@ -1,5 +1,5 @@
-<title>Kiss János – Munkaidő-nyilvántartó</title>const $=id=>document.getElementById(id);
-cons t STORE='munkaidoPWA_v1';
+<title>Kiss János – Munkaidő-nyilvántartó</title>const 
+const STORE='munkaidoPWA_v1';
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const monthNow=()=>today().slice(0,7);
 const fresh=()=>({works:[],drives:[],leaves:[],settings:{hourlyWage:0,dailyHours:8,overtimeRate:150,defaultWorkplace:'Műhely',vacationAllowance:0,drivingPay:'separate'}});
